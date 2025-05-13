@@ -34,7 +34,6 @@ media_remote_path = os.environ['media_remote_path'] + user
 tmp_local_path = os.environ['tmp_local_path'] + user
 media_local_path = os.environ['media_local_path'] + user + "_phone"
 
-
 try:
     if not args.sort:
         with pysftp.Connection(host=host, username=username, private_key=private_key_path) as sftp:
@@ -42,7 +41,7 @@ try:
                 # Checks to see if user has a tmp directory
                 if not os.path.isdir(tmp_local_path):
                     os.mkdir(tmp_local_path)
-                if len(sftp.listdir()) != 0:
+                if len(sftp.listdir()):
                     for directory in sftp.listdir():
                         # get_d copies all files in directory
                         sftp.get_d(directory, tmp_local_path, preserve_mtime=True)
@@ -68,7 +67,7 @@ try:
 
     # cd to desired directory for os.listdir to work
     os.chdir(tmp_local_path)
-    if len(os.listdir()) != 0:
+    if len(os.listdir()):
         for filename in os.listdir(tmp_local_path):
             if not filename.startswith("."):
                 year = filename[0:4]
@@ -91,8 +90,8 @@ try:
     else:
         print("no media to sort")
     exit(0)
-except (IOError, OSError, KeyError, SFTPError, pysftp.ConnectionException, pysftp.CredentialException, pysftp.SSHException,
-        pysftp.AuthenticationException) as error:
+except (IOError, OSError, KeyError, SFTPError, pysftp.ConnectionException, pysftp.CredentialException,
+        pysftp.SSHException, pysftp.AuthenticationException) as error:
     send_email(sender=sender, to=to,
                subject="[Urgent] Photo backup failed for " + user, message_text=str(error))
     print(str(error))
